@@ -1,189 +1,205 @@
 /**
- * LG Refrigerator Card for Home Assistant
- * ========================================
- * French-door refrigerator card (LG ThinQ) with freezer/fridge setpoints,
- * door status, filters, water usage, express freeze and notifications.
+ * Wine Cellar Card for Home Assistant
+ * ====================================
+ * Dual-zone Lovelace card for a Haier hOn wine cellar.
  *
  * License: MIT
  *
  */
 
-class LgRefrigeratorCard extends HTMLElement {
+class WineCellarCard extends HTMLElement {
     static STRINGS = {
         en: {
-            name: "Refrigerator",
-            door_open: "OPEN",
-            door_closed: "CLOSED",
-            door_nodata: "NO DATA",
-            air_filter: "Air filter",
-            water_filter: "Water filter",
-            water_used: "Water filtered",
-            express_on: "Express Freeze on",
-            express_off: "Express Freeze off",
-            tip_express: "Express Freeze",
-            tip_dismiss: "Dismiss",
-            notification_title: "ALERT",
-            zone1_label: "FRIDGE",
-            zone2_label: "FREEZER",
+            name: "Wine cellar",
+            badge_on: "ON",
+            badge_off: "OFF",
+            badge_nodata: "NO DATA",
+            target: "Target",
+            env_temp: "Room temperature",
+            mode: "Mode",
+            program: "Program",
+            light_on: "Light on",
+            light_off: "Light off",
+            error_title: "ERROR",
+            tip_light: "Cellar light",
         },
         fr: {
-            name: "Réfrigérateur",
-            door_open: "OUVERTE",
-            door_closed: "FERMÉE",
-            door_nodata: "PAS DE DONNÉES",
-            air_filter: "Filtre à air",
-            water_filter: "Filtre à eau",
-            water_used: "Eau filtrée",
-            express_on: "Freeze Express activé",
-            express_off: "Freeze Express désactivé",
-            tip_express: "Freeze Express",
-            tip_dismiss: "Ignorer",
-            notification_title: "ALERTE",
-            zone1_label: "RÉFRIGÉRATEUR",
-            zone2_label: "CONGÉLATEUR",
+            name: "Cave à vin",
+            badge_on: "ALLUMÉE",
+            badge_off: "ÉTEINTE",
+            badge_nodata: "PAS DE DONNÉES",
+            target: "Consigne",
+            env_temp: "Température ambiante",
+            mode: "Mode",
+            program: "Programme",
+            light_on: "Lumière allumée",
+            light_off: "Lumière éteinte",
+            error_title: "ERREUR",
+            tip_light: "Éclairage cave",
         },
         es: {
-            name: "Frigorífico",
-            door_open: "ABIERTA",
-            door_closed: "CERRADA",
-            door_nodata: "SIN DATOS",
-            air_filter: "Filtro de aire",
-            water_filter: "Filtro de agua",
-            water_used: "Agua filtrada",
-            express_on: "Congelación rápida activada",
-            express_off: "Congelación rápida desactivada",
-            tip_express: "Congelación rápida",
-            tip_dismiss: "Descartar",
-            notification_title: "ALERTA",
-            zone1_label: "NEVERA",
-            zone2_label: "CONGELADOR",
+            name: "Bodega de vinos",
+            badge_on: "ENCENDIDA",
+            badge_off: "APAGADA",
+            badge_nodata: "SIN DATOS",
+            target: "Consigna",
+            env_temp: "Temperatura ambiente",
+            mode: "Modo",
+            program: "Programa",
+            light_on: "Luz encendida",
+            light_off: "Luz apagada",
+            error_title: "ERROR",
+            tip_light: "Luz de la bodega",
         },
         it: {
-            name: "Frigorifero",
-            door_open: "APERTA",
-            door_closed: "CHIUSA",
-            door_nodata: "NESSUN DATO",
-            air_filter: "Filtro dell'aria",
-            water_filter: "Filtro dell'acqua",
-            water_used: "Acqua filtrata",
-            express_on: "Congelamento rapido attivo",
-            express_off: "Congelamento rapido disattivo",
-            tip_express: "Congelamento rapido",
-            tip_dismiss: "Ignora",
-            notification_title: "AVVISO",
-            zone1_label: "FRIGORIFERO",
-            zone2_label: "CONGELATORE",
+            name: "Cantina vini",
+            badge_on: "ACCESA",
+            badge_off: "SPENTA",
+            badge_nodata: "NESSUN DATO",
+            target: "Obiettivo",
+            env_temp: "Temperatura ambiente",
+            mode: "Modalità",
+            program: "Programma",
+            light_on: "Luce accesa",
+            light_off: "Luce spenta",
+            error_title: "ERRORE",
+            tip_light: "Luce cantina",
         },
         pt: {
-            name: "Frigorífico",
-            door_open: "ABERTA",
-            door_closed: "FECHADA",
-            door_nodata: "SEM DADOS",
-            air_filter: "Filtro de ar",
-            water_filter: "Filtro de água",
-            water_used: "Água filtrada",
-            express_on: "Congelação rápida ativada",
-            express_off: "Congelação rápida desativada",
-            tip_express: "Congelação rápida",
-            tip_dismiss: "Ignorar",
-            notification_title: "ALERTA",
-            zone1_label: "FRIGORÍFICO",
-            zone2_label: "CONGELADOR",
+            name: "Adega de vinhos",
+            badge_on: "LIGADA",
+            badge_off: "DESLIGADA",
+            badge_nodata: "SEM DADOS",
+            target: "Alvo",
+            env_temp: "Temperatura ambiente",
+            mode: "Modo",
+            program: "Programa",
+            light_on: "Luz ligada",
+            light_off: "Luz desligada",
+            error_title: "ERRO",
+            tip_light: "Luz da adega",
         },
         de: {
-            name: "Kühlschrank",
-            door_open: "OFFEN",
-            door_closed: "GESCHLOSSEN",
-            door_nodata: "KEINE DATEN",
-            air_filter: "Luftfilter",
-            water_filter: "Wasserfilter",
-            water_used: "Gefiltertes Wasser",
-            express_on: "Schnellgefrieren an",
-            express_off: "Schnellgefrieren aus",
-            tip_express: "Schnellgefrieren",
-            tip_dismiss: "Ausblenden",
-            notification_title: "WARNUNG",
-            zone1_label: "KÜHLSCHRANK",
-            zone2_label: "GEFRIERSCHRANK",
+            name: "Weinkühlschrank",
+            badge_on: "AN",
+            badge_off: "AUS",
+            badge_nodata: "KEINE DATEN",
+            target: "Sollwert",
+            env_temp: "Raumtemperatur",
+            mode: "Modus",
+            program: "Programm",
+            light_on: "Licht an",
+            light_off: "Licht aus",
+            error_title: "FEHLER",
+            tip_light: "Kellerbeleuchtung",
         },
         nl: {
-            name: "Koelkast",
-            door_open: "OPEN",
-            door_closed: "GESLOTEN",
-            door_nodata: "GEEN DATA",
-            air_filter: "Luchtfilter",
-            water_filter: "Waterfilter",
-            water_used: "Gefilterd water",
-            express_on: "Snelvriezen aan",
-            express_off: "Snelvriezen uit",
-            tip_express: "Snelvriezen",
-            tip_dismiss: "Negeren",
-            notification_title: "MELDING",
-            zone1_label: "KOELKAST",
-            zone2_label: "VRIEZER",
+            name: "Wijnkelder",
+            badge_on: "AAN",
+            badge_off: "UIT",
+            badge_nodata: "GEEN DATA",
+            target: "Doel",
+            env_temp: "Omgevingstemperatuur",
+            mode: "Modus",
+            program: "Programma",
+            light_on: "Licht aan",
+            light_off: "Licht uit",
+            error_title: "FOUT",
+            tip_light: "Kelderverlichting",
         },
     };
+
+    static NO_PROGRAM_STATES = ["none", "unknown", "unavailable", ""];
+
+    static RING_RADIUS = 39;
+    static RING_CIRCUMFERENCE = 2 * Math.PI * WineCellarCard.RING_RADIUS;
 
     static DEFAULTS = {
-        fridge_visual_position: "left",
-        hide_fridge_visual: false,
-        no_notification_states: ["none", "unknown", "unavailable", ""],
+        zone1_label: "ZONE 1",
+        zone2_label: "ZONE 2",
+        zone1_min: 5,
+        zone1_max: 20,
+        zone2_min: 5,
+        zone2_max: 20,
+        cellar_visual_position: "left",
+        hide_cellar_visual: false,
+        no_error_states: [
+            "00", "0", "none", "no error", "aucune erreur",
+            "unknown", "unavailable", ""
+        ],
     };
 
-    static NO_FILTER_STATES = ["unknown", "unavailable", ""];
-
-    static ZONE_FALLBACK_BOUNDS = {
-        1: {
-            min: 1,
-            max: 7,
-            step: 1
-        },
-        2: {
-            min: -24,
-            max: -14,
-            step: 1
-        },
+    static STUB_MODE_NAMES = {
+        "0": "-",
+        "1": "Standard",
+        "2": "Eco",
     };
 
     static VISUAL_ORDER = {
         left: {
             visual: 0,
-            zones: 1
+            zone1: 1,
+            zone2: 2
+        },
+        center: {
+            visual: 1,
+            zone1: 0,
+            zone2: 2
         },
         right: {
-            visual: 1,
-            zones: 0
+            visual: 2,
+            zone1: 0,
+            zone2: 1
         },
     };
 
     static getConfigElement() {
-        return document.createElement("lg-refrigerator-card-editor");
+        return document.createElement("wine-cellar-card-editor");
     }
 
     static getStubConfig() {
         return {
             name: "",
-            door_entity: "binary_sensor.refrigerateur_door",
-            express_mode_entity: "switch.refrigerateur_express_mode",
-            notification_entity: "event.refrigerateur_notification",
-            air_filter_entity: "sensor.refrigerateur_fresh_air_filter",
-            water_filter_entity: "sensor.refrigerateur_water_filter",
-            water_filter_used_entity: "sensor.refrigerateur_water_filter_used",
-            zone1_temp_entity: "number.refrigerateur_fridge_temperature",
-            zone2_temp_entity: "number.refrigerateur_freezer_temperature",
-            fridge_visual_position: "left",
-            hide_fridge_visual: false,
+            status_entity: "binary_sensor.wine_cellar_status",
+            error_entity: "",
+            light_entity: "",
+            env_temp_entity: "",
+            mode_entity: "",
+            mode_names: {
+                ...WineCellarCard.STUB_MODE_NAMES
+            },
+            program_name_entity: "",
+            zone1_label: "ZONE 1",
+            zone1_temp_entity: "",
+            zone1_target_entity: "",
+            zone1_humidity_entity: "",
+            zone1_min: 5,
+            zone1_max: 20,
+            zone2_label: "ZONE 2",
+            zone2_temp_entity: "",
+            zone2_target_entity: "",
+            zone2_humidity_entity: "",
+            zone2_min: 5,
+            zone2_max: 20,
+            cellar_visual_position: "left",
+            hide_cellar_visual: false,
         };
     }
 
     setConfig(config) {
+        if (!config.status_entity) {
+            throw new Error("wine-cellar-card: status_entity is required");
+        }
+
         this._config = {
-            ...LgRefrigeratorCard.DEFAULTS,
+            ...WineCellarCard.DEFAULTS,
             ...config,
+            mode_names: config.mode_names && typeof config.mode_names === "object"
+             ? config.mode_names
+             : {},
         };
 
         this._built = false;
-        this._dismissedNotificationKey = this._loadDismissedNotificationKey();
 
         if (this._hass) {
             this._build();
@@ -199,11 +215,11 @@ class LgRefrigeratorCard extends HTMLElement {
     }
 
     getCardSize() {
-        return 5;
+        return 4;
     }
 
     get _t() {
-        const strings = LgRefrigeratorCard.STRINGS;
+        const strings = WineCellarCard.STRINGS;
 
         const configured = String(this._config?.language || "").toLowerCase();
         if (configured && strings[configured])
@@ -223,15 +239,6 @@ class LgRefrigeratorCard extends HTMLElement {
         return strings.en;
     }
 
-    get _locale() {
-        return (
-            this._config?.language ||
-            this._hass?.locale?.language ||
-            this._hass?.language ||
-            "en"
-        );
-    }
-
     _st(entityId) {
         return entityId ? this._hass?.states?.[entityId] : undefined;
     }
@@ -249,9 +256,10 @@ class LgRefrigeratorCard extends HTMLElement {
         if (!Number.isFinite(number))
             return null;
 
-        return digits > 0
-             ? String(Number.parseFloat(number.toFixed(digits)))
-             : String(Math.round(number));
+        return new Intl.NumberFormat(this._hass?.locale?.language || "en", {
+            minimumFractionDigits: digits,
+            maximumFractionDigits: digits,
+        }).format(number);
     }
 
     _moreInfo(entityId) {
@@ -267,104 +275,29 @@ class LgRefrigeratorCard extends HTMLElement {
             }));
     }
 
-    _zoneBounds(zone) {
-        const config = this._config;
-        const entity = config[`zone${zone}_temp_entity`];
-        const state = this._st(entity);
-        const fallback = LgRefrigeratorCard.ZONE_FALLBACK_BOUNDS[zone];
-
-        const attrMin = state?.attributes?.min;
-        const attrMax = state?.attributes?.max;
-        const attrStep = state?.attributes?.step;
-
-        const min = Number.isFinite(attrMin) ? attrMin : fallback.min;
-        const max = Number.isFinite(attrMax) ? attrMax : fallback.max;
-        const step = Number.isFinite(attrStep) ? attrStep : fallback.step;
-
-        return {
-            min,
-            max,
-            step
-        };
+    _isLightOn(state) {
+        return ["on", "true"].includes(String(state ?? "").toLowerCase());
     }
 
-    _formatEventType(rawType) {
-        if (!rawType)
-            return null;
-        return String(rawType).replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-    }
-
-    _relativeTime(isoString) {
-        const date = new Date(isoString);
-        if (Number.isNaN(date.getTime()))
-            return null;
-
-        const diffMs = date.getTime() - Date.now();
-        const diffMin = Math.round(diffMs / 60000);
-        const rtf = new Intl.RelativeTimeFormat(this._locale, {
-            numeric: "auto"
-        });
-
-        if (Math.abs(diffMin) < 60)
-            return rtf.format(diffMin, "minute");
-        const diffHour = Math.round(diffMin / 60);
-        if (Math.abs(diffHour) < 24)
-            return rtf.format(diffHour, "hour");
-        const diffDay = Math.round(diffHour / 24);
-        return rtf.format(diffDay, "day");
-    }
-
-    _setZoneValue(zone, delta) {
-        const config = this._config;
-        const entityId = config[`zone${zone}_temp_entity`];
-        if (!entityId || !this._hass)
+    _onLightClick() {
+        const entityId = this._config.light_entity;
+        if (!entityId)
             return;
 
-        const current = this._num(entityId);
-        if (current === null)
-            return;
-
-        const { min, max, step } = this._zoneBounds(zone);
-        const next = Math.max(min, Math.min(max, current + delta * step));
-        if (next === current)
-            return;
-
-        this._hass.callService("number", "set_value", {
-            entity_id: entityId,
-            value: next
-        });
-    }
-
-    _dismissedStorageKey() {
-        const entity = this._config?.notification_entity;
-        return entity ? `lg-refrigerator-card-dismissed:${entity}` : null;
-    }
-
-    _loadDismissedNotificationKey() {
-        const storageKey = this._dismissedStorageKey();
-        if (!storageKey)
-            return null;
-
-        try {
-            return window.localStorage.getItem(storageKey);
-        } catch (error) {
-            return null;
+        const domain = entityId.split(".")[0];
+        if (["light", "switch"].includes(domain)) {
+            this._hass.callService(domain, "toggle", {
+                entity_id: entityId
+            });
+        } else {
+            this._moreInfo(entityId);
         }
     }
 
-    _saveDismissedNotificationKey(key) {
-        const storageKey = this._dismissedStorageKey();
-        if (!storageKey)
-            return;
-
-        try {
-            if (key === null || key === undefined)
-                window.localStorage.removeItem(storageKey);
-            else
-                window.localStorage.setItem(storageKey, key);
-        } catch (error) {
-            // Ignore storage errors (e.g. private browsing mode with storage disabled).
-        }
+    _ringDasharray(fraction) {
+        const circumference = WineCellarCard.RING_CIRCUMFERENCE;
+        const safeFraction = Math.max(0, Math.min(1, fraction));
+        return `${(safeFraction * circumference).toFixed(1)} ${circumference.toFixed(1)}`;
     }
 
     _build() {
@@ -398,7 +331,7 @@ class LgRefrigeratorCard extends HTMLElement {
           background: var(--ha-card-background, var(--card-background-color));
           box-shadow: 0 2px 6px rgba(0,0,0,.15);
         }
-        .h-icon ha-icon { --mdc-icon-size: 24px; color: #0288d1; }
+        .h-icon ha-icon { --mdc-icon-size: 24px; color: #7a2038; }
         .h-title {
           flex: 0 1 auto; min-width: 56px;
           overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
@@ -415,11 +348,10 @@ class LgRefrigeratorCard extends HTMLElement {
         }
         .badge .b-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--disabled-text-color); }
         .nodata .badge { background: rgba(128,128,128,.12); color: var(--secondary-text-color); }
-        .closed .badge { background: rgba(var(--rgb-success-color,76,175,80),.16); color: var(--success-color,#4caf50); }
-        .closed .badge .b-dot { background: var(--success-color,#4caf50); }
-        .open .badge { background: rgba(var(--rgb-error-color,244,67,54),.14); color: var(--error-color,#f44336); }
-        .open .badge .b-dot { background: var(--error-color,#f44336); animation: pulse-dot 1.6s ease-in-out infinite; }
-        @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+        .off .badge { background: rgba(var(--rgb-error-color,244,67,54),.14); color: var(--error-color,#f44336); }
+        .off .badge .b-dot { background: var(--error-color,#f44336); }
+        .on .badge { background: rgba(var(--rgb-success-color,76,175,80),.16); color: var(--success-color,#4caf50); }
+        .on .badge .b-dot { background: var(--success-color,#4caf50); }
         .h-spacer { flex: 1; }
         .h-btn {
           display: flex; align-items: center; justify-content: center;
@@ -432,73 +364,50 @@ class LgRefrigeratorCard extends HTMLElement {
         .h-btn:active { transform: scale(.94); }
         .h-btn ha-icon { --mdc-icon-size: 19px; }
         .h-btn.on {
-          color: #039be5; border-color: #039be5;
-          background: rgba(3,155,229,.12);
+          color: var(--primary-color); border-color: var(--primary-color);
+          background: rgba(var(--rgb-primary-color,3,169,244),.12);
         }
-        .notification-banner {
+        .error-banner {
           display: flex; align-items: center; gap: 8px;
-          margin-top: 12px; padding: 10px 10px 10px 14px; border-radius: 14px;
+          margin-top: 12px; padding: 10px 14px; border-radius: 14px;
           color: var(--error-color,#db4437);
           background: rgba(var(--rgb-error-color,219,68,55),.12);
           font-size: 13px; font-weight: 700; cursor: pointer;
         }
-        .notification-banner ha-icon { --mdc-icon-size: 18px; flex-shrink: 0; }
-        .notification-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-        .notification-time { font-size: 10.5px; font-weight: 600; opacity: .75; text-transform: none; letter-spacing: 0; }
-        .notification-dismiss {
-          display: flex; align-items: center; justify-content: center;
-          width: 22px; height: 22px; flex-shrink: 0; border-radius: 8px;
-          color: var(--error-color,#db4437); cursor: pointer;
-        }
-        .notification-dismiss:hover { background: rgba(var(--rgb-error-color,219,68,55),.18); }
-        .notification-dismiss ha-icon { --mdc-icon-size: 15px; }
+        .error-banner ha-icon { --mdc-icon-size: 18px; }
         .content-row { display: flex; gap: 12px; margin-top: 14px; align-items: center; }
-        .fridge-visual {
-          display: flex; align-items: center; justify-content: center;
-          width: 85px; flex-shrink: 0;
+        .cellar-visual {
+          display: flex; align-items: center; width: 83px; flex-shrink: 0;
+          transition: opacity .4s ease, filter .4s ease;
         }
-        .fridge-visual svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,.2)); }
-        .door-glow, .drawer-glow { transition: opacity .5s ease; }
-        .door-glow.pulsing { animation: pulse-glow 2s ease-in-out infinite; }
-        @keyframes pulse-glow { 0%,100% { opacity: .18; } 50% { opacity: .4; } }
-        .zones-column {
-          flex: 1 1 0; min-width: 0;
-          display: flex; flex-direction: column; gap: 8px;
-        }
+        .cellar-visual svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,.25)); }
+        .off .cellar-visual { opacity: .45; filter: grayscale(.4); }
+        .cv-glow { transition: opacity .5s ease; }
         .zone-panel {
-          flex: 0 0 auto; min-width: 0;
+          flex: 1 1 0; min-width: 0; padding: 10px 8px;
           text-align: center; border: 1px solid var(--divider-color);
-          border-radius: 12px; overflow: hidden;
+          border-radius: 12px;
           background: var(--ha-card-background, var(--card-background-color));
-          display: flex; flex-direction: row; align-items: stretch;
-        }
-        .zone-center {
-          flex: 1 1 auto; min-width: 0; padding: 12px 4px;
-          display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         .zone-label {
-          margin-bottom: 4px; color: var(--secondary-text-color);
+          margin-bottom: 6px; color: var(--secondary-text-color);
           font-size: 9.5px; font-weight: 800; letter-spacing: 1.1px;
         }
-        .temp-value {
-          min-width: 0; cursor: pointer;
-          display: flex; align-items: baseline; justify-content: center; gap: 2px;
+        .ring-box { position: relative; width: 68px; height: 68px; margin: 0 auto; cursor: pointer; }
+        .ring-box svg { width: 100%; height: 100%; }
+        .ring-track { stroke: var(--divider-color); }
+        .ring-arc { stroke: #b0335a; stroke-linecap: round; transition: stroke-dasharray .5s ease; }
+        .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .ring-temp { color: var(--primary-text-color); font-size: 14.5px; font-weight: 800; line-height: 1; }
+        .ring-unit { color: var(--secondary-text-color); font-size: 8.5px; font-weight: 700; }
+        .zone-target { margin-top: 6px; color: var(--secondary-text-color); font-size: 9.5px; cursor: pointer; }
+        .zone-target b { color: var(--primary-text-color); }
+        .zone-humidity {
+          display: flex; align-items: center; justify-content: center; gap: 3px;
+          margin-top: 4px; color: var(--info-color,#039be5);
+          font-size: 10px; font-weight: 700; cursor: pointer;
         }
-        .temp-value .temp-num { color: var(--primary-text-color); font-size: 21px; font-weight: 800; line-height: 1; }
-        .temp-value .temp-unit { color: var(--secondary-text-color); font-size: 11px; font-weight: 700; }
-        .stepper-btn {
-          display: flex; align-items: center; justify-content: center;
-          width: 62px; flex-shrink: 0;
-          border: none;
-          color: var(--secondary-text-color);
-          background: var(--ha-card-background, var(--card-background-color));
-          cursor: pointer; transition: background-color .12s ease;
-        }
-        .stepper-btn:active { background-color: rgba(2,136,209,.12); }
-        .stepper-btn[id$="Minus"] { border-right: 1px solid var(--divider-color); }
-        .stepper-btn[id$="Plus"] { border-left: 1px solid var(--divider-color); }
-        .stepper-btn ha-icon { --mdc-icon-size: 30px; }
-        .stepper-btn.disabled { opacity: .35; pointer-events: none; }
+        .zone-humidity ha-icon { --mdc-icon-size: 12px; }
         .panel {
           display: grid; grid-template-columns: repeat(3,1fr);
           margin-top: 12px; padding: 12px 16px;
@@ -509,76 +418,87 @@ class LgRefrigeratorCard extends HTMLElement {
         .info-item:first-child { border-left: 0; padding-left: 0; }
         .info-label { color: var(--secondary-text-color); font-size: 10px; font-weight: 700; letter-spacing: .8px; }
         .info-value { margin-top: 4px; color: var(--primary-text-color); font-size: 13.5px; font-weight: 800; overflow-wrap: break-word; }
-        .info-value.warn { color: var(--error-color,#f44336); }
-        .content-row:has(> .fridge-visual.hidden) .temp-value .temp-num { font-size: 25px; }
+        .content-row:has(> .cellar-visual.hidden) .ring-box { width: 84px; height: 84px; }
+        .content-row:has(> .cellar-visual.hidden) .ring-temp { font-size: 17px; }
         .hidden { display: none !important; }
       </style>
 
       <ha-card>
-        <div class="wrap closed" id="wrap">
+        <div class="wrap off" id="wrap">
           <div class="header">
-            <div class="h-icon"><ha-icon icon="mdi:fridge-outline"></ha-icon></div>
+            <div class="h-icon"><ha-icon icon="mdi:glass-wine"></ha-icon></div>
             <div class="h-title" id="name"></div>
-            <div class="badge hidden" id="badge"><span class="b-dot"></span><span id="badgeText"></span></div>
+            <div class="badge"><span class="b-dot"></span><span id="badgeText"></span></div>
             <div class="h-spacer"></div>
-            <div class="h-btn hidden" id="expressBtn" title="${text.tip_express}">
-              <ha-icon icon="mdi:snowflake" id="expressIcon"></ha-icon>
+            <div class="h-btn hidden" id="lightBtn" title="${text.tip_light}">
+              <ha-icon icon="mdi:lightbulb-off-outline" id="lightIcon"></ha-icon>
             </div>
           </div>
 
-          <div class="notification-banner hidden" id="notificationBanner">
-            <ha-icon icon="mdi:bell-alert"></ha-icon>
-            <div class="notification-text">
-              <span id="notificationText"></span>
-              <span class="notification-time" id="notificationTime"></span>
-            </div>
-            <div class="h-spacer"></div>
-            <div class="notification-dismiss" id="notificationDismiss" title="${text.tip_dismiss}">
-              <ha-icon icon="mdi:close"></ha-icon>
-            </div>
+          <div class="error-banner hidden" id="errorBanner">
+            <ha-icon icon="mdi:alert-circle"></ha-icon><span id="errorText"></span>
           </div>
 
           <div class="content-row">
-            <div class="fridge-visual" id="fridgeVisual">
-              <svg viewBox="0 0 96 176" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-label="Refrigerator illustration">
+            <div class="cellar-visual" id="cellarVisual">
+              <svg viewBox="0 0 96 180" xmlns="http://www.w3.org/2000/svg" aria-label="Wine cellar illustration">
                 <defs>
-                  <linearGradient id="frBody" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stop-color="#eef0f2"/><stop offset=".5" stop-color="#ccd0d4"/><stop offset="1" stop-color="#9da2a9"/>
+                  <linearGradient id="cvBody" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#2b2b2e"/><stop offset=".5" stop-color="#161618"/><stop offset="1" stop-color="#08080a"/>
                   </linearGradient>
-                  <linearGradient id="frDoor" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="#f6f7f8"/><stop offset="1" stop-color="#d4d7db"/>
+                  <linearGradient id="cvGlass" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#20262f"/><stop offset="1" stop-color="#0b0e13"/>
                   </linearGradient>
                 </defs>
-                <rect x="4" y="6" width="88" height="165" rx="8" fill="url(#frBody)" stroke="#7d818a" stroke-width="1"/>
-                <rect x="8" y="11" width="38" height="117" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
-                <rect x="50" y="11" width="38" height="117" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
-                <rect x="46" y="11" width="4" height="117" fill="#8a8f96"/>
-                <rect class="door-glow" id="doorGlow" x="8" y="11" width="80" height="117" rx="5" fill="#f44336" opacity="0"/>
-                <rect x="14" y="23" width="26" height="43" rx="3" fill="#2b2e33"/>
-                <rect x="18" y="28" width="18" height="10" rx="1.5" fill="#0d3b4d"/>
-                <text x="27" y="35.5" text-anchor="middle" font-size="4" font-family="monospace" fill="#6fd0e0">hOn</text>
-                <circle cx="19.5" cy="45.5" r="1.5" fill="#5a5e64"/>
-                <circle cx="24.5" cy="45.5" r="1.5" fill="#5a5e64"/>
-                <circle cx="29.5" cy="45.5" r="1.5" fill="#5a5e64"/>
-                <circle cx="34.5" cy="45.5" r="1.5" fill="#5a5e64"/>
-                <path d="M17 54 h16 a2 2 0 0 1 2 2 v3 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-3 a2 2 0 0 1 2 -2 z" fill="#1c1e21"/>
-                <rect x="41.5" y="28" width="2.6" height="80" rx="1.3" fill="#8f949b"/>
-                <rect x="51.9" y="28" width="2.6" height="80" rx="1.3" fill="#8f949b"/>
-                <rect x="8" y="133" width="80" height="32" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
-                <rect class="drawer-glow" id="drawerGlow" x="8" y="133" width="80" height="32" rx="5" fill="#4fc3f7" opacity="0"/>
-                <rect x="30" y="141" width="36" height="4" rx="2" fill="#8f949b"/>
+                <rect x="4" y="4" width="88" height="172" rx="10" fill="url(#cvBody)" stroke="#000"/>
+                <rect x="4" y="4" width="88" height="15" rx="10" fill="#0b0b0d"/>
+                <rect x="4" y="11" width="88" height="8" fill="#0b0b0d"/>
+                <rect x="39" y="8" width="18" height="6.4" rx="2" fill="#000" stroke="#2a2a2a" stroke-width=".5"/>
+                <text x="48" y="12.9" text-anchor="middle" font-size="4.4" font-family="monospace" fill="#6fd0e0">12°</text>
+                <rect x="10" y="23" width="76" height="145" rx="6" fill="url(#cvGlass)" stroke="#000"/>
+                <rect class="cv-glow" id="cvGlow" x="10" y="23" width="76" height="145" rx="6" fill="#ffcf7a" opacity=".08"/>
+                <g>
+                  <circle cx="18" cy="40" r="4" fill="#7a1f2b"/>
+                  <circle cx="30" cy="40" r="4" fill="#e9e3d3"/>
+                  <circle cx="42" cy="40" r="4" fill="#33264a"/>
+                  <circle cx="54" cy="40" r="4" fill="#b8862c"/>
+                  <circle cx="66" cy="40" r="4" fill="#8a2035"/>
+                  <circle cx="78" cy="40" r="4" fill="#4a1e2e"/>
+                  <circle cx="18" cy="58" r="4" fill="#4a1e2e"/>
+                  <circle cx="30" cy="58" r="4" fill="#8a2035"/>
+                  <circle cx="42" cy="58" r="4" fill="#b8862c"/>
+                  <circle cx="54" cy="58" r="4" fill="#33264a"/>
+                  <circle cx="66" cy="58" r="4" fill="#e9e3d3"/>
+                  <circle cx="78" cy="58" r="4" fill="#7a1f2b"/>
+                  <circle cx="20" cy="100" r="5" fill="#8a2035"/>
+                  <circle cx="35" cy="100" r="5" fill="#33264a"/>
+                  <circle cx="50" cy="100" r="5" fill="#e9e3d3"/>
+                  <circle cx="65" cy="100" r="5" fill="#b8862c"/>
+                  <circle cx="78" cy="100" r="5" fill="#7a1f2b"/>
+                  <circle cx="20" cy="122" r="5" fill="#33264a"/>
+                  <circle cx="35" cy="122" r="5" fill="#7a1f2b"/>
+                  <circle cx="50" cy="122" r="5" fill="#b8862c"/>
+                  <circle cx="65" cy="122" r="5" fill="#e9e3d3"/>
+                  <circle cx="78" cy="122" r="5" fill="#4a1e2e"/>
+                </g>
+                <rect x="10" y="76" width="76" height="5" fill="#050506"/>
+                <text x="48" y="80" text-anchor="middle" font-size="3" font-family="sans-serif" letter-spacing="1.5" fill="#5a5a5e">DUAL SPACE</text>
+                <rect x="14" y="140" width="34" height="7" rx="3.5" fill="#141416"/>
+                <circle cx="17" cy="143.5" r="1.6" fill="#c9a227"/>
+                <rect x="34" y="152" width="40" height="7.5" rx="3.75" fill="#1c1c1f"/>
+                <circle cx="38" cy="155.75" r="1.7" fill="#c9a227"/>
+                <rect x="15" y="174" width="9" height="4" rx="1.5" fill="#1a1a1c"/>
+                <rect x="72" y="174" width="9" height="4" rx="1.5" fill="#1a1a1c"/>
               </svg>
             </div>
-            <div class="zones-column" id="zonesColumn">
-              ${this._zoneMarkup(1)}
-              ${this._zoneMarkup(2)}
-            </div>
+            ${this._zoneMarkup(1)}
+            ${this._zoneMarkup(2)}
           </div>
 
           <div class="panel hidden" id="infoPanel">
-            <div class="info-item hidden" id="airFilterItem"><div class="info-label">${text.air_filter}</div><div class="info-value" id="airFilterValue">—</div></div>
-            <div class="info-item hidden" id="waterFilterItem"><div class="info-label">${text.water_filter}</div><div class="info-value" id="waterFilterValue">—</div></div>
-            <div class="info-item hidden" id="waterUsedItem"><div class="info-label">${text.water_used}</div><div class="info-value" id="waterUsedValue">—</div></div>
+            <div class="info-item hidden" id="envItem"><div class="info-label">${text.env_temp}</div><div class="info-value" id="envValue">—</div></div>
+            <div class="info-item hidden" id="modeItem"><div class="info-label">${text.mode}</div><div class="info-value" id="modeValue">—</div></div>
+            <div class="info-item hidden" id="programItem"><div class="info-label">${text.program}</div><div class="info-value" id="programValue">—</div></div>
           </div>
         </div>
       </ha-card>
@@ -587,34 +507,53 @@ class LgRefrigeratorCard extends HTMLElement {
         this._el = (id) => root.getElementById(id);
         const moreInfo = (entityId) => () => this._moreInfo(entityId);
 
-        this._el("notificationBanner").addEventListener("click", moreInfo(config.notification_entity));
-        this._el("notificationDismiss").addEventListener("click", (event) => {
-            event.stopPropagation();
-            this._dismissNotification();
-        });
-        this._el("expressBtn").addEventListener("click", () => this._onExpressClick());
-        this._el("airFilterItem").addEventListener("click", moreInfo(config.air_filter_entity));
-        this._el("waterFilterItem").addEventListener("click", moreInfo(config.water_filter_entity));
-        this._el("waterUsedItem").addEventListener("click", moreInfo(config.water_filter_used_entity));
-        this._el("badge").addEventListener("click", moreInfo(config.door_entity));
+        this._el("errorBanner").addEventListener("click", moreInfo(config.error_entity));
+        this._el("lightBtn").addEventListener("click", () => this._onLightClick());
+        this._el("envItem").addEventListener("click", moreInfo(config.env_temp_entity));
+        this._el("modeItem").addEventListener("click", moreInfo(config.mode_entity));
+        this._el("programItem").addEventListener("click", moreInfo(config.program_name_entity));
 
-        for (const zone of[1, 2]) {
+        for (const zone of [1, 2]) {
             this._el(`zone${zone}Ring`).addEventListener("click", moreInfo(config[`zone${zone}_temp_entity`]));
-            this._el(`zone${zone}Label`).textContent = config[`zone${zone}_label`] || text[`zone${zone}_label`];
-            this._el(`zone${zone}Minus`).addEventListener("click", (event) => {
-                event.stopPropagation();
-                this._setZoneValue(zone, -1);
-            });
-            this._el(`zone${zone}Plus`).addEventListener("click", (event) => {
-                event.stopPropagation();
-                this._setZoneValue(zone, 1);
-            });
+            this._el(`zone${zone}Target`).addEventListener("click", moreInfo(config[`zone${zone}_target_entity`]));
+            this._el(`zone${zone}HumidityRow`).addEventListener("click", moreInfo(config[`zone${zone}_humidity_entity`]));
+            this._el(`zone${zone}Label`).textContent = config[`zone${zone}_label`];
         }
 
-        const order = LgRefrigeratorCard.VISUAL_ORDER[config.fridge_visual_position] || LgRefrigeratorCard.VISUAL_ORDER.left;
-        this._el("fridgeVisual").style.order = order.visual;
-        this._el("zonesColumn").style.order = order.zones;
-        this._el("fridgeVisual").classList.toggle("hidden", Boolean(config.hide_fridge_visual));
+        const order = WineCellarCard.VISUAL_ORDER[config.cellar_visual_position] || WineCellarCard.VISUAL_ORDER.left;
+        this._el("cellarVisual").style.order = order.visual;
+        this._el("zone1Panel").style.order = order.zone1;
+        this._el("zone2Panel").style.order = order.zone2;
+        this._el("cellarVisual").classList.toggle("hidden", Boolean(config.hide_cellar_visual));
+
+        // Cache the nodes touched on every hass update, so _update()/_updateZone()
+        // no longer pay for a getElementById() lookup on each state change.
+        this._nodes = {
+            wrap: this._el("wrap"),
+            name: this._el("name"),
+            badgeText: this._el("badgeText"),
+            errorBanner: this._el("errorBanner"),
+            errorText: this._el("errorText"),
+            lightBtn: this._el("lightBtn"),
+            lightIcon: this._el("lightIcon"),
+            cvGlow: this._el("cvGlow"),
+            envItem: this._el("envItem"),
+            envValue: this._el("envValue"),
+            modeItem: this._el("modeItem"),
+            modeValue: this._el("modeValue"),
+            programItem: this._el("programItem"),
+            programValue: this._el("programValue"),
+            infoPanel: this._el("infoPanel"),
+        };
+
+        for (const zone of [1, 2]) {
+            this._nodes[`zone${zone}Panel`] = this._el(`zone${zone}Panel`);
+            this._nodes[`zone${zone}Temp`] = this._el(`zone${zone}Temp`);
+            this._nodes[`zone${zone}Arc`] = this._el(`zone${zone}Arc`);
+            this._nodes[`zone${zone}Target`] = this._el(`zone${zone}Target`);
+            this._nodes[`zone${zone}HumidityRow`] = this._el(`zone${zone}HumidityRow`);
+            this._nodes[`zone${zone}Humidity`] = this._el(`zone${zone}Humidity`);
+        }
 
         this._built = true;
     }
@@ -622,153 +561,162 @@ class LgRefrigeratorCard extends HTMLElement {
     _zoneMarkup(zone) {
         return `
       <div class="zone-panel hidden" id="zone${zone}Panel">
-        <div class="stepper-btn" id="zone${zone}Minus"><ha-icon icon="mdi:minus"></ha-icon></div>
-        <div class="zone-center">
-          <div class="zone-label" id="zone${zone}Label"></div>
-          <div class="temp-value" id="zone${zone}Ring"><span class="temp-num" id="zone${zone}Temp">—</span><span class="temp-unit">°C</span></div>
+        <div class="zone-label" id="zone${zone}Label"></div>
+        <div class="ring-box" id="zone${zone}Ring">
+          <svg viewBox="0 0 92 92">
+            <circle class="ring-track" cx="46" cy="46" r="39" fill="none" stroke-width="7"/>
+            <circle class="ring-arc" id="zone${zone}Arc" cx="46" cy="46" r="39" fill="none" stroke-width="7" stroke-dasharray="0 245" transform="rotate(-90 46 46)"/>
+          </svg>
+          <div class="ring-center"><div class="ring-temp" id="zone${zone}Temp">—</div><div class="ring-unit">°C</div></div>
         </div>
-        <div class="stepper-btn" id="zone${zone}Plus"><ha-icon icon="mdi:plus"></ha-icon></div>
+        <div class="zone-target" id="zone${zone}Target"></div>
+        <div class="zone-humidity hidden" id="zone${zone}HumidityRow"><ha-icon icon="mdi:water-percent"></ha-icon><span id="zone${zone}Humidity"></span></div>
       </div>
     `;
     }
 
-    _onExpressClick() {
-        const entityId = this._config.express_mode_entity;
-        if (!entityId || !this._hass)
-            return;
-        this._hass.callService("switch", "toggle", {
-            entity_id: entityId
-        });
-    }
-
-    _dismissNotification() {
-        this._dismissedNotificationKey = this._currentNotificationKey;
-        this._saveDismissedNotificationKey(this._currentNotificationKey);
-        this._el("notificationBanner").classList.add("hidden");
+    // Shared logic for the three optional "info panel" items (env temp, mode,
+    // program). Returns whether the item is configured, so the caller can
+    // fold the result into the overall "anyInfo" flag.
+    _updateInfoItem(itemKey, valueKey, hasEntity, hasValue, displayValue) {
+        if (!hasEntity) {
+            this._nodes[itemKey].classList.add("hidden");
+            return false;
+        }
+        this._nodes[itemKey].classList.remove("hidden");
+        this._nodes[valueKey].textContent = hasValue ? displayValue : "N/A";
+        return true;
     }
 
     _update() {
         const config = this._config;
         const text = this._t;
-        const wrap = this._el("wrap");
+        const nodes = this._nodes;
+        const status = this._st(config.status_entity);
+        const noData = !status || ["unknown", "unavailable"].includes(status.state);
+        const isOn = !noData && String(status.state).toLowerCase() === "on";
 
-        this._el("name").textContent = config.name || text.name;
+        nodes.wrap.classList.toggle("on", isOn);
+        nodes.wrap.classList.toggle("off", !isOn && !noData);
+        nodes.wrap.classList.toggle("nodata", noData);
+        nodes.name.textContent = config.name || text.name;
+        nodes.badgeText.textContent = noData ? text.badge_nodata : (isOn ? text.badge_on : text.badge_off);
 
-        if (config.door_entity) {
-            const doorState = this._st(config.door_entity);
-            const noData = !doorState || ["unknown", "unavailable"].includes(doorState.state);
-            const isOpen = !noData && String(doorState.state).toLowerCase() === "on";
-
-            wrap.classList.toggle("open", isOpen);
-            wrap.classList.toggle("closed", !isOpen && !noData);
-            wrap.classList.toggle("nodata", noData);
-            this._el("badge").classList.remove("hidden");
-            this._el("badgeText").textContent = noData ? text.door_nodata : (isOpen ? text.door_open : text.door_closed);
-            this._el("doorGlow").setAttribute("opacity", isOpen ? ".35" : "0");
-            this._el("doorGlow").classList.toggle("pulsing", isOpen);
+        if (config.error_entity) {
+            const errorState = this._st(config.error_entity);
+            const value = String(errorState?.state ?? "").toLowerCase();
+            const hasError = Boolean(errorState) && !config.no_error_states.includes(value);
+            nodes.errorBanner.classList.toggle("hidden", !hasError);
+            if (hasError)
+                nodes.errorText.textContent = `${text.error_title}: ${errorState.state}`;
         } else {
-            wrap.classList.remove("open", "nodata");
-            wrap.classList.add("closed");
-            this._el("badge").classList.add("hidden");
-            this._el("doorGlow").setAttribute("opacity", "0");
-            this._el("doorGlow").classList.remove("pulsing");
+            nodes.errorBanner.classList.add("hidden");
         }
 
-        let expressOn = false;
-        if (config.express_mode_entity) {
-            const state = this._st(config.express_mode_entity);
-            expressOn = String(state?.state ?? "").toLowerCase() === "on";
-            this._el("expressBtn").classList.remove("hidden");
-            this._el("expressBtn").classList.toggle("on", expressOn);
-            this._el("expressBtn").title = expressOn ? text.express_on : text.express_off;
-            this._el("expressIcon").setAttribute("icon", expressOn ? "mdi:snowflake" : "mdi:snowflake-off");
+        let lightOn = false;
+        if (config.light_entity) {
+            lightOn = this._isLightOn(this._st(config.light_entity)?.state);
+            nodes.lightBtn.classList.remove("hidden");
+            nodes.lightBtn.classList.toggle("on", isOn && lightOn);
+            nodes.lightBtn.title = isOn && lightOn ? text.light_on : text.light_off;
+            nodes.lightIcon.setAttribute("icon", isOn && lightOn ? "mdi:lightbulb-on" : "mdi:lightbulb-off-outline");
         } else {
-            this._el("expressBtn").classList.add("hidden");
-        }
-        this._el("drawerGlow").setAttribute("opacity", expressOn ? ".45" : "0");
-
-        if (config.notification_entity) {
-            const state = this._st(config.notification_entity);
-            const eventType = state?.attributes?.event_type;
-            const value = String(eventType ?? "").toLowerCase();
-            const hasNotification = Boolean(state) && eventType && !config.no_notification_states.includes(value);
-            const notificationKey = hasNotification ? `${state.state}|${eventType}` : null;
-
-            this._currentNotificationKey = notificationKey;
-            const isDismissed = notificationKey !== null && notificationKey === this._dismissedNotificationKey;
-
-            this._el("notificationBanner").classList.toggle("hidden", !hasNotification || isDismissed);
-            if (hasNotification && !isDismissed) {
-                this._el("notificationText").textContent = `${text.notification_title}: ${this._formatEventType(eventType)}`;
-                const relative = this._relativeTime(state.state);
-                this._el("notificationTime").textContent = relative || "";
-            }
-        } else {
-            this._el("notificationBanner").classList.add("hidden");
+            nodes.lightBtn.classList.add("hidden");
         }
 
-        this._updateZone(1);
-        this._updateZone(2);
+        nodes.cvGlow.setAttribute("opacity", isOn && lightOn ? ".55" : (isOn ? ".15" : "0"));
+
+        this._updateZone(1, isOn);
+        this._updateZone(2, isOn);
 
         let anyInfo = false;
-        if (config.air_filter_entity) {
-            const state = this._st(config.air_filter_entity);
-            const raw = String(state?.state ?? "").toLowerCase();
-            const hasWarning = raw.includes("replace") || raw.includes("change");
-            this._el("airFilterItem").classList.remove("hidden");
-            this._el("airFilterValue").textContent = state && !LgRefrigeratorCard.NO_FILTER_STATES.includes(raw) ? state.state : "N/A";
-            this._el("airFilterValue").classList.toggle("warn", hasWarning);
-            anyInfo = true;
-        } else
-            this._el("airFilterItem").classList.add("hidden");
 
-        if (config.water_filter_entity) {
-            const state = this._st(config.water_filter_entity);
-            const raw = String(state?.state ?? "").toLowerCase();
-            const hasWarning = raw.includes("replace") || raw.includes("change");
-            this._el("waterFilterItem").classList.remove("hidden");
-            this._el("waterFilterValue").textContent = state && !LgRefrigeratorCard.NO_FILTER_STATES.includes(raw) ? state.state : "N/A";
-            this._el("waterFilterValue").classList.toggle("warn", hasWarning);
-            anyInfo = true;
-        } else
-            this._el("waterFilterItem").classList.add("hidden");
+        const envValue = config.env_temp_entity ? this._num(config.env_temp_entity) : null;
+        anyInfo = this._updateInfoItem(
+            "envItem", "envValue",
+            Boolean(config.env_temp_entity),
+            isOn && envValue !== null,
+            `${this._fmtNum(envValue, 1)} °C`
+        ) || anyInfo;
 
-        if (config.water_filter_used_entity) {
-            const value = this._num(config.water_filter_used_entity);
-            this._el("waterUsedItem").classList.remove("hidden");
-            this._el("waterUsedValue").textContent = value !== null ? `${this._fmtNum(value, 1)} m³` : "N/A";
-            anyInfo = true;
-        } else
-            this._el("waterUsedItem").classList.add("hidden");
+        const modeState = config.mode_entity ? this._st(config.mode_entity) : undefined;
+        const modeRaw = modeState?.state;
+        const modeNames = config.mode_names || {};
+        const hasCustomModeNames = Object.keys(modeNames).length > 0;
+        const modeLabel = hasCustomModeNames && modeRaw !== undefined && modeRaw !== null && Object.prototype.hasOwnProperty.call(modeNames, modeRaw)
+             ? modeNames[modeRaw]
+             : modeRaw;
+        anyInfo = this._updateInfoItem(
+            "modeItem", "modeValue",
+            Boolean(config.mode_entity),
+            isOn && modeRaw !== undefined && modeRaw !== null,
+            modeLabel
+        ) || anyInfo;
 
-        this._el("infoPanel").classList.toggle("hidden", !anyInfo);
+        const programState = config.program_name_entity ? this._st(config.program_name_entity) : undefined;
+        const programRaw = String(programState?.state ?? "").toLowerCase();
+        anyInfo = this._updateInfoItem(
+            "programItem", "programValue",
+            Boolean(config.program_name_entity),
+            isOn && !WineCellarCard.NO_PROGRAM_STATES.includes(programRaw),
+            programState?.state
+        ) || anyInfo;
+
+        nodes.infoPanel.classList.toggle("hidden", !anyInfo);
     }
 
-    _updateZone(zone) {
+    _updateZone(zone, isOn) {
         const config = this._config;
+        const nodes = this._nodes;
         const tempEntity = config[`zone${zone}_temp_entity`];
-        const panel = this._el(`zone${zone}Panel`);
+        const targetEntity = config[`zone${zone}_target_entity`];
+        const humidityEntity = config[`zone${zone}_humidity_entity`];
+        const panel = nodes[`zone${zone}Panel`];
 
-        if (!tempEntity) {
+        if (!tempEntity && !targetEntity && !humidityEntity) {
             panel.classList.add("hidden");
             return;
         }
 
         panel.classList.remove("hidden");
-        const value = this._num(tempEntity);
-        const { min, max, step } = this._zoneBounds(zone);
+        const temp = tempEntity ? this._num(tempEntity) : null;
+        const target = targetEntity ? this._num(targetEntity) : null;
+        const humidity = humidityEntity ? this._num(humidityEntity) : null;
+        const min = Number(config[`zone${zone}_min`]);
+        const max = Number(config[`zone${zone}_max`]);
 
-        this._el(`zone${zone}Temp`).textContent = value !== null ? this._fmtNum(value, Number.isInteger(step) ? 0 : 1) : "N/A";
+        nodes[`zone${zone}Temp`].textContent = isOn && temp !== null ? this._fmtNum(temp, 1) : "N/A";
+        const fraction = isOn && temp !== null && max !== min ? (temp - min) / (max - min) : 0;
+        nodes[`zone${zone}Arc`].setAttribute("stroke-dasharray", this._ringDasharray(fraction));
 
-        this._el(`zone${zone}Minus`).classList.toggle("disabled", value === null || value <= min);
-        this._el(`zone${zone}Plus`).classList.toggle("disabled", value === null || value >= max);
+        nodes[`zone${zone}Target`].innerHTML = targetEntity
+             ? (isOn && target !== null ? `${this._t.target}: <b>${this._fmtNum(target, 1)} °C</b>` : `${this._t.target}: <b>N/A</b>`)
+             : "";
+
+        if (humidityEntity) {
+            nodes[`zone${zone}HumidityRow`].classList.remove("hidden");
+            nodes[`zone${zone}Humidity`].textContent = isOn && humidity !== null ? `${Math.round(humidity)}%` : "N/A";
+        } else {
+            nodes[`zone${zone}HumidityRow`].classList.add("hidden");
+        }
     }
 }
 
-class LgRefrigeratorCardEditor extends HTMLElement {
+class WineCellarCardEditor extends HTMLElement {
+    static LANGUAGE_NAMES = {
+        en: "English",
+        fr: "Français",
+        es: "Español",
+        it: "Italiano",
+        pt: "Português",
+        de: "Deutsch",
+        nl: "Nederlands",
+    };
+
     constructor() {
         super();
         this._rendered = false;
+        this._modeNamesTimer = null;
     }
 
     setConfig(config) {
@@ -789,6 +737,11 @@ class LgRefrigeratorCardEditor extends HTMLElement {
             this._rendered = true;
         }
         this._updateValues();
+    }
+
+    disconnectedCallback() {
+        if (this._modeNamesTimer)
+            clearTimeout(this._modeNamesTimer);
     }
 
     _render() {
@@ -826,6 +779,10 @@ class LgRefrigeratorCardEditor extends HTMLElement {
           background: var(--ha-card-background, var(--card-background-color));
           border: 1px solid var(--divider-color); border-radius: 8px; font: inherit;
         }
+        textarea {
+          min-height: 112px; resize: vertical; line-height: 1.5;
+          font-family: var(--code-font-family, ui-monospace, SFMono-Regular, Consolas, monospace);
+        }
         ha-entity-picker { display: block; width: 100%; }
         .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 42px; }
         .switch-text { display: grid; gap: 3px; min-width: 0; }
@@ -840,45 +797,40 @@ class LgRefrigeratorCardEditor extends HTMLElement {
           <summary>General</summary>
           <div class="section-content"><div class="entity-grid">
             <label>Card name<input data-config="name" type="text"></label>
+            ${this._entityPicker("status_entity", "Status entity", ["binary_sensor"])}
             <label>
               Language
               <select data-config="language">
                 <option value="">Automatic (Home Assistant language)</option>
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-                <option value="es">Español</option>
-                <option value="it">Italiano</option>
-                <option value="pt">Português</option>
-                <option value="de">Deutsch</option>
-                <option value="nl">Nederlands</option>
+                ${this._languageOptions()}
               </select>
             </label>
-            <label>Illustration position<select data-config="fridge_visual_position"><option value="left">Left</option><option value="right">Right</option></select></label>
+            <label>Cellar illustration position<select data-config="cellar_visual_position"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></label>
             <div class="switch-row">
-              <div class="switch-text"><span class="switch-label">Hide illustration</span><span class="field-description">Hide the refrigerator illustration and enlarge the temperature zones.</span></div>
-              <ha-switch data-config="hide_fridge_visual"></ha-switch>
+              <div class="switch-text"><span class="switch-label">Hide cellar illustration</span><span class="field-description">Hide the cellar illustration and enlarge the temperature zones.</span></div>
+              <ha-switch data-config="hide_cellar_visual"></ha-switch>
             </div>
           </div></div>
         </details>
 
-        ${this._zoneSection(1, "Fridge")}
-        ${this._zoneSection(2, "Freezer")}
+        ${this._zoneSection(1)}
+        ${this._zoneSection(2)}
 
         <details class="section">
-          <summary>Door &amp; notifications</summary>
+          <summary>Additional entities</summary>
           <div class="section-content"><div class="entity-grid">
-            ${this._entityPicker("door_entity", "Door entity", ["binary_sensor"])}
-            ${this._entityPicker("express_mode_entity", "Express Freeze switch", ["switch"])}
-            ${this._entityPicker("notification_entity", "Notification event entity", ["event"])}
-          </div></div>
-        </details>
-
-        <details class="section">
-          <summary>Filters &amp; water usage</summary>
-          <div class="section-content"><div class="entity-grid">
-            ${this._entityPicker("air_filter_entity", "Air filter entity", ["sensor"])}
-            ${this._entityPicker("water_filter_entity", "Water filter entity", ["sensor"])}
-            ${this._entityPicker("water_filter_used_entity", "Water filtered (m³) entity", ["sensor"])}
+            ${this._entityPicker("error_entity", "Error entity", ["sensor"])}
+            ${this._entityPicker("light_entity", "Light entity", ["binary_sensor", "light", "switch"])}
+            ${this._entityPicker("env_temp_entity", "Environment temperature", ["sensor"])}
+            ${this._entityPicker("mode_entity", "Mode entity", ["sensor", "select", "input_select"])}
+            <label>
+              Mode names
+              <textarea data-config="mode_names" spellcheck="false" placeholder="'0': '-'
+'1': Standard
+'2': Eco"></textarea>
+              <span class="field-description">One mapping per line, format: code: label. Clear the field to show the mode entity's raw, untranslated value on the card instead.</span>
+            </label>
+            ${this._entityPicker("program_name_entity", "Program name entity", ["sensor"])}
           </div></div>
         </details>
       </div>
@@ -888,18 +840,32 @@ class LgRefrigeratorCardEditor extends HTMLElement {
         this._initializeStandardFields();
     }
 
+    // Language options are generated from WineCellarCard.STRINGS so a new
+    // language only needs to be added in one place.
+    _languageOptions() {
+        return Object.keys(WineCellarCard.STRINGS)
+            .map((code) => `<option value="${code}">${WineCellarCardEditor.LANGUAGE_NAMES[code] || code}</option>`)
+            .join("");
+    }
+
     _entityPicker(key, label, domains = []) {
         return `<div class="field"><span>${label}</span><ha-entity-picker data-config="${key}" data-domains="${domains.join(',')}" allow-custom-entity></ha-entity-picker></div>`;
     }
 
-    _zoneSection(zone, defaultTitle) {
+    _zoneSection(zone) {
         return `
       <details class="section">
-        <summary>${defaultTitle}</summary>
+        <summary>Zone ${zone}</summary>
         <div class="section-content">
           <div class="entity-grid">
             <label>Label<input data-config="zone${zone}_label" type="text"></label>
-            ${this._entityPicker(`zone${zone}_temp_entity`, "Target temperature entity (number)", ["number"])}
+            ${this._entityPicker(`zone${zone}_temp_entity`, "Temperature entity", ["sensor"])}
+            ${this._entityPicker(`zone${zone}_target_entity`, "Target temperature entity", ["sensor", "number"])}
+            ${this._entityPicker(`zone${zone}_humidity_entity`, "Humidity entity", ["sensor"])}
+          </div>
+          <div class="grid">
+            <label>Minimum temperature<input data-config="zone${zone}_min" type="number" step="0.5"></label>
+            <label>Maximum temperature<input data-config="zone${zone}_max" type="number" step="0.5"></label>
           </div>
         </div>
       </details>
@@ -918,7 +884,7 @@ class LgRefrigeratorCardEditor extends HTMLElement {
     }
 
     _initializeStandardFields() {
-        this.querySelectorAll("input[data-config]").forEach((element) => {
+        this.querySelectorAll("input[data-config], textarea[data-config]").forEach((element) => {
             element.addEventListener("input", (event) => this._valueChanged(event));
         });
         this.querySelectorAll("select[data-config], ha-switch[data-config]").forEach((element) => {
@@ -943,10 +909,39 @@ class LgRefrigeratorCardEditor extends HTMLElement {
                 element.checked = value === true;
                 return;
             }
+            if (element.tagName === "TEXTAREA" && key === "mode_names") {
+                if (document.activeElement !== element) {
+                    element.value = this._formatModeNames(value);
+                }
+                return;
+            }
 
             if (document.activeElement !== element)
                 element.value = value ?? "";
         });
+    }
+
+    _formatModeNames(modeNames) {
+        if (!modeNames || typeof modeNames !== "object" || Array.isArray(modeNames))
+            return "";
+        return Object.entries(modeNames).map(([key, label]) => `'${key}': ${label}`).join("\n");
+    }
+
+    _parseModeNames(text) {
+        const result = {};
+        String(text ?? "").split(/\r?\n/).forEach((line) => {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith("#"))
+                return;
+            const separator = trimmed.indexOf(":");
+            if (separator < 0)
+                return;
+            const key = trimmed.slice(0, separator).trim().replace(/^['"]|['"]$/g, "");
+            const label = trimmed.slice(separator + 1).trim().replace(/^['"]|['"]$/g, "");
+            if (key)
+                result[key] = label;
+        });
+        return result;
     }
 
     _valueChanged(event) {
@@ -962,6 +957,8 @@ class LgRefrigeratorCardEditor extends HTMLElement {
             value = event.detail?.value ?? target.value ?? "";
         } else if (target.tagName === "HA-SWITCH") {
             value = Boolean(target.checked);
+        } else if (target.tagName === "TEXTAREA" && key === "mode_names") {
+            value = this._parseModeNames(target.value);
         } else if (target.type === "number") {
             value = target.value === "" ? undefined : Number(target.value);
         } else {
@@ -977,7 +974,7 @@ class LgRefrigeratorCardEditor extends HTMLElement {
             delete config[key];
         this._config = config;
 
-        this.dispatchEvent(new CustomEvent("config-changed", {
+        const emit = () => this.dispatchEvent(new CustomEvent("config-changed", {
                 detail: {
                     config: {
                         ...this._config
@@ -986,22 +983,30 @@ class LgRefrigeratorCardEditor extends HTMLElement {
                 bubbles: true,
                 composed: true,
             }));
+
+        if (key === "mode_names") {
+            if (this._modeNamesTimer)
+                clearTimeout(this._modeNamesTimer);
+            this._modeNamesTimer = setTimeout(emit, 250);
+        } else {
+            emit();
+        }
     }
 }
 
-if (!customElements.get("lg-refrigerator-card-editor")) {
-    customElements.define("lg-refrigerator-card-editor", LgRefrigeratorCardEditor);
+if (!customElements.get("wine-cellar-card-editor")) {
+    customElements.define("wine-cellar-card-editor", WineCellarCardEditor);
 }
-if (!customElements.get("lg-refrigerator-card")) {
-    customElements.define("lg-refrigerator-card", LgRefrigeratorCard);
+if (!customElements.get("wine-cellar-card")) {
+    customElements.define("wine-cellar-card", WineCellarCard);
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((card) => card.type === "lg-refrigerator-card")) {
+if (!window.customCards.some((card) => card.type === "wine-cellar-card")) {
     window.customCards.push({
-        type: "lg-refrigerator-card",
-        name: "LG Refrigerator Card",
-        description: "French-door LG ThinQ refrigerator card with freezer/fridge setpoints, door status, filters and notifications",
+        type: "wine-cellar-card",
+        name: "Wine Cellar Card",
+        description: "Dual-zone wine cellar card with temperature, humidity, light, mode and errors",
         preview: true,
     });
 }
