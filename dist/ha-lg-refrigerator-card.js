@@ -766,6 +766,27 @@ class LgRefrigeratorCard extends HTMLElement {
 }
 
 class LgRefrigeratorCardEditor extends HTMLElement {
+    static SELECT_OPTIONS = {
+        language: [
+            { value: "auto", label: "Automatic (Home Assistant language)" },
+            { value: "en", label: "English" },
+            { value: "fr", label: "Français" },
+            { value: "es", label: "Español" },
+            { value: "it", label: "Italiano" },
+            { value: "pt", label: "Português" },
+            { value: "de", label: "Deutsch" },
+            { value: "nl", label: "Nederlands" },
+        ],
+        fridge_visual_position: [
+            { value: "left", label: "Left" },
+            { value: "right", label: "Right" },
+        ],
+    };
+
+    static SELECT_EMPTY_VALUE = {
+        language: "auto",
+    };
+
     constructor() {
         super();
         this._rendered = false;
@@ -820,13 +841,13 @@ class LgRefrigeratorCardEditor extends HTMLElement {
         .grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
         .entity-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
         label, .field { display: grid; gap: 6px; color: var(--secondary-text-color); font-size: 12px; }
-        input, select, textarea {
+        input {
           box-sizing: border-box; width: 100%; min-height: 42px; padding: 8px 10px;
           color: var(--primary-text-color);
           background: var(--ha-card-background, var(--card-background-color));
           border: 1px solid var(--divider-color); border-radius: 8px; font: inherit;
         }
-        ha-entity-picker { display: block; width: 100%; }
+        ha-entity-picker, ha-selector { display: block; width: 100%; }
         .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 42px; }
         .switch-text { display: grid; gap: 3px; min-width: 0; }
         .switch-label { color: var(--primary-text-color); font-size: 14px; }
@@ -840,20 +861,8 @@ class LgRefrigeratorCardEditor extends HTMLElement {
           <summary>General</summary>
           <div class="section-content"><div class="entity-grid">
             <label>Card name<input data-config="name" type="text"></label>
-            <label>
-              Language
-              <select data-config="language">
-                <option value="">Automatic (Home Assistant language)</option>
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-                <option value="es">Español</option>
-                <option value="it">Italiano</option>
-                <option value="pt">Português</option>
-                <option value="de">Deutsch</option>
-                <option value="nl">Nederlands</option>
-              </select>
-            </label>
-            <label>Illustration position<select data-config="fridge_visual_position"><option value="left">Left</option><option value="right">Right</option></select></label>
+            ${this._selectField("language", "Language")}
+            ${this._selectField("fridge_visual_position", "Illustration position")}
             <div class="switch-row">
               <div class="switch-text"><span class="switch-label">Hide illustration</span><span class="field-description">Hide the refrigerator illustration and enlarge the temperature zones.</span></div>
               <ha-switch data-config="hide_fridge_visual"></ha-switch>
@@ -885,11 +894,16 @@ class LgRefrigeratorCardEditor extends HTMLElement {
     `;
 
         this._initializeEntityPickers();
+        this._initializeSelectFields();
         this._initializeStandardFields();
     }
 
     _entityPicker(key, label, domains = []) {
         return `<div class="field"><span>${label}</span><ha-entity-picker data-config="${key}" data-domains="${domains.join(',')}" allow-custom-entity></ha-entity-picker></div>`;
+    }
+
+    _selectField(key, label) {
+        return `<div class="field"><span>${label}</span><ha-selector data-config="${key}"></ha-selector></div>`;
     }
 
     _zoneSection(zone, defaultTitle) {
@@ -917,11 +931,25 @@ class LgRefrigeratorCardEditor extends HTMLElement {
         });
     }
 
+    _initializeSelectFields() {
+        this.querySelectorAll("ha-selector[data-config]").forEach((selector) => {
+            const key = selector.dataset.config;
+            selector.hass = this._hass;
+            selector.selector = {
+                select: {
+                    mode: "dropdown",
+                    options: LgRefrigeratorCardEditor.SELECT_OPTIONS[key] || [],
+                },
+            };
+            selector.addEventListener("value-changed", (event) => this._valueChanged(event));
+        });
+    }
+
     _initializeStandardFields() {
         this.querySelectorAll("input[data-config]").forEach((element) => {
             element.addEventListener("input", (event) => this._valueChanged(event));
         });
-        this.querySelectorAll("select[data-config], ha-switch[data-config]").forEach((element) => {
+        this.querySelectorAll("ha-switch[data-config]").forEach((element) => {
             element.addEventListener("change", (event) => this._valueChanged(event));
         });
     }
@@ -937,6 +965,15 @@ class LgRefrigeratorCardEditor extends HTMLElement {
             if (element.tagName === "HA-ENTITY-PICKER") {
                 element.hass = this._hass;
                 element.value = value ?? "";
+                return;
+            }
+            if (element.tagName === "HA-SELECTOR") {
+                element.hass = this._hass;
+                // Map an unset/empty config value to the field's sentinel
+                // (e.g. "auto" for language) so the dropdown shows the right label
+                // instead of appearing blank.
+                const emptyValue = LgRefrigeratorCardEditor.SELECT_EMPTY_VALUE[key] ?? "";
+                element.value = (value === undefined || value === null || value === "") ? emptyValue : value;
                 return;
             }
             if (element.tagName === "HA-SWITCH") {
@@ -958,8 +995,14 @@ class LgRefrigeratorCardEditor extends HTMLElement {
             return;
 
         let value;
-        if (target.tagName === "HA-ENTITY-PICKER") {
+        if (target.tagName === "HA-ENTITY-PICKER" || target.tagName === "HA-SELECTOR") {
             value = event.detail?.value ?? target.value ?? "";
+            // Convert the sentinel value (e.g. "auto") back to "" so it gets
+            // removed from the saved config, preserving the original
+            // "automatic/unset" behavior.
+            const emptyValue = LgRefrigeratorCardEditor.SELECT_EMPTY_VALUE[key];
+            if (emptyValue !== undefined && value === emptyValue)
+                value = "";
         } else if (target.tagName === "HA-SWITCH") {
             value = Boolean(target.checked);
         } else if (target.type === "number") {
