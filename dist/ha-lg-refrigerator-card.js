@@ -176,6 +176,19 @@ class LgRefrigeratorCard extends HTMLElement {
         };
     }
 
+    // Native display name for a language code (e.g. "de" -> "Deutsch"),
+    // used by the editor to auto-build the Language dropdown from STRINGS.
+    // Falls back to the raw code if Intl.DisplayNames is unavailable.
+    static languageDisplayName(code) {
+        try {
+            const displayNames = new Intl.DisplayNames([code], { type: "language" });
+            const name = displayNames.of(code);
+            return name ? name.charAt(0).toUpperCase() + name.slice(1) : code;
+        } catch (error) {
+            return code;
+        }
+    }
+
     setConfig(config) {
         this._config = {
             ...LgRefrigeratorCard.DEFAULTS,
@@ -767,25 +780,13 @@ class LgRefrigeratorCard extends HTMLElement {
 
 class LgRefrigeratorCardEditor extends HTMLElement {
     static SELECT_OPTIONS = {
-        language: [
-            { value: "auto", label: "Automatic (Home Assistant language)" },
-            { value: "en", label: "English" },
-            { value: "fr", label: "Français" },
-            { value: "es", label: "Español" },
-            { value: "it", label: "Italiano" },
-            { value: "pt", label: "Português" },
-            { value: "de", label: "Deutsch" },
-            { value: "nl", label: "Nederlands" },
-        ],
         fridge_visual_position: [
             { value: "left", label: "Left" },
             { value: "right", label: "Right" },
         ],
     };
 
-    static SELECT_EMPTY_VALUE = {
-        language: "auto",
-    };
+    static AUTO_LANGUAGE = "auto";
 
     constructor() {
         super();
@@ -810,6 +811,17 @@ class LgRefrigeratorCardEditor extends HTMLElement {
             this._rendered = true;
         }
         this._updateValues();
+    }
+
+    _languageOptions() {
+        const codes = Object.keys(LgRefrigeratorCard.STRINGS);
+        return [
+            { value: LgRefrigeratorCardEditor.AUTO_LANGUAGE, label: "Automatic (Home Assistant language)" },
+            ...codes.map((code) => ({
+                value: code,
+                label: LgRefrigeratorCard.languageDisplayName(code),
+            })),
+        ];
     }
 
     _render() {
@@ -861,8 +873,8 @@ class LgRefrigeratorCardEditor extends HTMLElement {
           <summary>General</summary>
           <div class="section-content"><div class="entity-grid">
             <label>Card name<input data-config="name" type="text"></label>
-            ${this._selectField("language", "Language")}
-            ${this._selectField("fridge_visual_position", "Illustration position")}
+            <div class="field"><span>Language</span><ha-selector data-config="language"></ha-selector></div>
+            <div class="field"><span>Illustration position</span><ha-selector data-config="fridge_visual_position"></ha-selector></div>
             <div class="switch-row">
               <div class="switch-text"><span class="switch-label">Hide illustration</span><span class="field-description">Hide the refrigerator illustration and enlarge the temperature zones.</span></div>
               <ha-switch data-config="hide_fridge_visual"></ha-switch>
@@ -902,10 +914,6 @@ class LgRefrigeratorCardEditor extends HTMLElement {
         return `<div class="field"><span>${label}</span><ha-entity-picker data-config="${key}" data-domains="${domains.join(',')}" allow-custom-entity></ha-entity-picker></div>`;
     }
 
-    _selectField(key, label) {
-        return `<div class="field"><span>${label}</span><ha-selector data-config="${key}"></ha-selector></div>`;
-    }
-
     _zoneSection(zone, defaultTitle) {
         return `
       <details class="section">
@@ -934,11 +942,15 @@ class LgRefrigeratorCardEditor extends HTMLElement {
     _initializeSelectFields() {
         this.querySelectorAll("ha-selector[data-config]").forEach((selector) => {
             const key = selector.dataset.config;
+            const options = key === "language"
+                ? this._languageOptions()
+                : LgRefrigeratorCardEditor.SELECT_OPTIONS[key] || [];
+
             selector.hass = this._hass;
             selector.selector = {
                 select: {
                     mode: "dropdown",
-                    options: LgRefrigeratorCardEditor.SELECT_OPTIONS[key] || [],
+                    options,
                 },
             };
             selector.addEventListener("value-changed", (event) => this._valueChanged(event));
@@ -969,11 +981,10 @@ class LgRefrigeratorCardEditor extends HTMLElement {
             }
             if (element.tagName === "HA-SELECTOR") {
                 element.hass = this._hass;
-                // Map an unset/empty config value to the field's sentinel
-                // (e.g. "auto" for language) so the dropdown shows the right label
-                // instead of appearing blank.
-                const emptyValue = LgRefrigeratorCardEditor.SELECT_EMPTY_VALUE[key] ?? "";
-                element.value = (value === undefined || value === null || value === "") ? emptyValue : value;
+                // "language" needs the sentinel when unset so the dropdown
+                // shows "Automatic..." instead of appearing blank.
+                const isEmpty = value === undefined || value === null || value === "";
+                element.value = (key === "language" && isEmpty) ? LgRefrigeratorCardEditor.AUTO_LANGUAGE : (value ?? "");
                 return;
             }
             if (element.tagName === "HA-SWITCH") {
@@ -997,11 +1008,7 @@ class LgRefrigeratorCardEditor extends HTMLElement {
         let value;
         if (target.tagName === "HA-ENTITY-PICKER" || target.tagName === "HA-SELECTOR") {
             value = event.detail?.value ?? target.value ?? "";
-            // Convert the sentinel value (e.g. "auto") back to "" so it gets
-            // removed from the saved config, preserving the original
-            // "automatic/unset" behavior.
-            const emptyValue = LgRefrigeratorCardEditor.SELECT_EMPTY_VALUE[key];
-            if (emptyValue !== undefined && value === emptyValue)
+            if (key === "language" && value === LgRefrigeratorCardEditor.AUTO_LANGUAGE)
                 value = "";
         } else if (target.tagName === "HA-SWITCH") {
             value = Boolean(target.checked);
