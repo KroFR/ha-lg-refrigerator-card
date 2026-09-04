@@ -181,7 +181,9 @@ class LgRefrigeratorCard extends HTMLElement {
     // Falls back to the raw code if Intl.DisplayNames is unavailable.
     static languageDisplayName(code) {
         try {
-            const displayNames = new Intl.DisplayNames([code], { type: "language" });
+            const displayNames = new Intl.DisplayNames([code], {
+                type: "language"
+            });
             const name = displayNames.of(code);
             return name ? name.charAt(0).toUpperCase() + name.slice(1) : code;
         } catch (error) {
@@ -241,8 +243,7 @@ class LgRefrigeratorCard extends HTMLElement {
             this._config?.language ||
             this._hass?.locale?.language ||
             this._hass?.language ||
-            "en"
-        );
+            "en");
     }
 
     _st(entityId) {
@@ -263,8 +264,8 @@ class LgRefrigeratorCard extends HTMLElement {
             return null;
 
         return digits > 0
-             ? String(Number.parseFloat(number.toFixed(digits)))
-             : String(Math.round(number));
+         ? String(Number.parseFloat(number.toFixed(digits)))
+         : String(Math.round(number));
     }
 
     _moreInfo(entityId) {
@@ -567,14 +568,16 @@ class LgRefrigeratorCard extends HTMLElement {
                 <rect x="50" y="11" width="38" height="117" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
                 <rect x="46" y="11" width="4" height="117" fill="#8a8f96"/>
                 <rect class="door-glow" id="doorGlow" x="8" y="11" width="80" height="117" rx="5" fill="#f44336" opacity="0"/>
-                <rect x="14" y="23" width="26" height="43" rx="3" fill="#2b2e33"/>
-                <rect x="18" y="28" width="18" height="10" rx="1.5" fill="#0d3b4d"/>
-                <text x="27" y="35.5" text-anchor="middle" font-size="4" font-family="monospace" fill="#6fd0e0">hOn</text>
-                <circle cx="19.5" cy="45.5" r="1.5" fill="#5a5e64"/>
-                <circle cx="24.5" cy="45.5" r="1.5" fill="#5a5e64"/>
-                <circle cx="29.5" cy="45.5" r="1.5" fill="#5a5e64"/>
-                <circle cx="34.5" cy="45.5" r="1.5" fill="#5a5e64"/>
-                <path d="M17 54 h16 a2 2 0 0 1 2 2 v3 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-3 a2 2 0 0 1 2 -2 z" fill="#1c1e21"/>
+                <rect x="13" y="61" width="26" height="35" rx="3" fill="#2b2e33"/>
+                <rect x="16" y="65" width="20" height="13" rx="1.5" fill="#0d3b4d"/>
+                <text x="26" y="73.2" text-anchor="middle" font-size="5.5" font-family="monospace" fill="#6fd0e0" id="displayLg">LG</text>
+                <text x="26" y="70.2" text-anchor="middle" font-size="3.6" font-family="monospace" fill="#6fd0e0" id="displayZone1Text"></text>
+                <text x="26" y="75.6" text-anchor="middle" font-size="3.6" font-family="monospace" fill="#6fd0e0" id="displayZone2Text"></text>
+                <circle cx="18.5" cy="83" r="1.5" fill="#5a5e64"/>
+                <circle cx="23.5" cy="83" r="1.5" fill="#5a5e64"/>
+                <circle cx="28.5" cy="83" r="1.5" fill="#5a5e64"/>
+                <circle cx="33.5" cy="83" r="1.5" fill="#5a5e64"/>
+                <path d="M17 87 h17 a2 2 0 0 1 2 2 v3 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-3 a2 2 0 0 1 2 -2 z" fill="#1c1e21"/>
                 <rect x="41.5" y="28" width="2.6" height="80" rx="1.3" fill="#8f949b"/>
                 <rect x="51.9" y="28" width="2.6" height="80" rx="1.3" fill="#8f949b"/>
                 <rect x="8" y="133" width="80" height="32" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
@@ -660,6 +663,45 @@ class LgRefrigeratorCard extends HTMLElement {
         this._el("notificationBanner").classList.add("hidden");
     }
 
+    _updateDisplayScreen() {
+        const config = this._config;
+        const zone1Entity = config.zone1_temp_entity;
+        const zone2Entity = config.zone2_temp_entity;
+
+        const displayLg = this._el("displayLg");
+        const displayZone1 = this._el("displayZone1Text");
+        const displayZone2 = this._el("displayZone2Text");
+        if (!displayLg || !displayZone1 || !displayZone2)
+            return;
+
+        if (!zone1Entity && !zone2Entity) {
+            displayLg.classList.remove("hidden");
+            displayZone1.textContent = "";
+            displayZone2.textContent = "";
+            return;
+        }
+
+        displayLg.classList.add("hidden");
+
+        if (zone1Entity) {
+            const value = this._num(zone1Entity);
+            const { step } = this._zoneBounds(1);
+            const formatted = value !== null ? this._fmtNum(value, Number.isInteger(step) ? 0 : 1) : null;
+            displayZone1.textContent = formatted !== null ? `${formatted}°C` : "--";
+        } else {
+            displayZone1.textContent = "";
+        }
+
+        if (zone2Entity) {
+            const value = this._num(zone2Entity);
+            const { step } = this._zoneBounds(2);
+            const formatted = value !== null ? this._fmtNum(value, Number.isInteger(step) ? 0 : 1) : null;
+            displayZone2.textContent = formatted !== null ? `${formatted}°C` : "--";
+        } else {
+            displayZone2.textContent = "";
+        }
+    }
+
     _update() {
         const config = this._config;
         const text = this._t;
@@ -722,6 +764,7 @@ class LgRefrigeratorCard extends HTMLElement {
 
         this._updateZone(1);
         this._updateZone(2);
+        this._updateDisplayScreen();
 
         let anyInfo = false;
         if (config.air_filter_entity) {
@@ -780,9 +823,13 @@ class LgRefrigeratorCard extends HTMLElement {
 
 class LgRefrigeratorCardEditor extends HTMLElement {
     static SELECT_OPTIONS = {
-        fridge_visual_position: [
-            { value: "left", label: "Left" },
-            { value: "right", label: "Right" },
+        fridge_visual_position: [{
+                value: "left",
+                label: "Left"
+            }, {
+                value: "right",
+                label: "Right"
+            },
         ],
     };
 
@@ -815,12 +862,14 @@ class LgRefrigeratorCardEditor extends HTMLElement {
 
     _languageOptions() {
         const codes = Object.keys(LgRefrigeratorCard.STRINGS);
-        return [
-            { value: LgRefrigeratorCardEditor.AUTO_LANGUAGE, label: "Automatic (Home Assistant language)" },
+        return [{
+                value: LgRefrigeratorCardEditor.AUTO_LANGUAGE,
+                label: "Automatic (Home Assistant language)"
+            },
             ...codes.map((code) => ({
-                value: code,
-                label: LgRefrigeratorCard.languageDisplayName(code),
-            })),
+                    value: code,
+                    label: LgRefrigeratorCard.languageDisplayName(code),
+                })),
         ];
     }
 
@@ -886,7 +935,7 @@ class LgRefrigeratorCardEditor extends HTMLElement {
         ${this._zoneSection(2, "Freezer")}
 
         <details class="section">
-          <summary>Door &amp; notifications</summary>
+          <summary>Door & notifications</summary>
           <div class="section-content"><div class="entity-grid">
             ${this._entityPicker("door_entity", "Door entity", ["binary_sensor"])}
             ${this._entityPicker("express_mode_entity", "Express Freeze switch", ["switch"])}
@@ -895,7 +944,7 @@ class LgRefrigeratorCardEditor extends HTMLElement {
         </details>
 
         <details class="section">
-          <summary>Filters &amp; water usage</summary>
+          <summary>Filters & water usage</summary>
           <div class="section-content"><div class="entity-grid">
             ${this._entityPicker("air_filter_entity", "Air filter entity", ["sensor"])}
             ${this._entityPicker("water_filter_entity", "Water filter entity", ["sensor"])}
@@ -943,8 +992,8 @@ class LgRefrigeratorCardEditor extends HTMLElement {
         this.querySelectorAll("ha-selector[data-config]").forEach((selector) => {
             const key = selector.dataset.config;
             const options = key === "language"
-                ? this._languageOptions()
-                : LgRefrigeratorCardEditor.SELECT_OPTIONS[key] || [];
+                 ? this._languageOptions()
+                 : LgRefrigeratorCardEditor.SELECT_OPTIONS[key] || [];
 
             selector.hass = this._hass;
             selector.selector = {
