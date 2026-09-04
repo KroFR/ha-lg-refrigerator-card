@@ -25,7 +25,7 @@ This card is designed to work with entities exposed by the [LG Thinq](https://ww
 
 ## 🧪 Model tested
 
-- GML8031ST.ASTQGSF (Fench Door)
+- GML8031ST.ASTQGSF (French Door)
 
 ## 📦 Installation
 
