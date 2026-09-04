@@ -1,7 +1,7 @@
 /**
  * LG Refrigerator Card for Home Assistant
  * ========================================
- * French-door refrigerator card (LG ThinQ) with freezer/fridge setpoints,
+ * Refrigerator card (LG ThinQ) with freezer/fridge setpoints,
  * door status, filters, water usage, express freeze and notifications.
  *
  * License: MIT
@@ -125,6 +125,7 @@ class LgRefrigeratorCard extends HTMLElement {
     };
 
     static DEFAULTS = {
+        fridge_layout: "french_door",
         fridge_visual_position: "left",
         hide_fridge_visual: false,
         no_notification_states: ["none", "unknown", "unavailable", ""],
@@ -162,23 +163,9 @@ class LgRefrigeratorCard extends HTMLElement {
 
     static getStubConfig() {
         return {
-            name: "",
-            door_entity: "binary_sensor.refrigerateur_door",
-            express_mode_entity: "switch.refrigerateur_express_mode",
-            notification_entity: "event.refrigerateur_notification",
-            air_filter_entity: "sensor.refrigerateur_fresh_air_filter",
-            water_filter_entity: "sensor.refrigerateur_water_filter",
-            water_filter_used_entity: "sensor.refrigerateur_water_filter_used",
-            zone1_temp_entity: "number.refrigerateur_fridge_temperature",
-            zone2_temp_entity: "number.refrigerateur_freezer_temperature",
-            fridge_visual_position: "left",
-            hide_fridge_visual: false,
         };
     }
 
-    // Native display name for a language code (e.g. "de" -> "Deutsch"),
-    // used by the editor to auto-build the Language dropdown from STRINGS.
-    // Falls back to the raw code if Intl.DisplayNames is unavailable.
     static languageDisplayName(code) {
         try {
             const displayNames = new Intl.DisplayNames([code], {
@@ -381,6 +368,107 @@ class LgRefrigeratorCard extends HTMLElement {
         }
     }
 
+    // Renders the LG control panel / display
+    _controlPanelSvg(px, py) {
+        return `
+          <rect x="${px}" y="${py}" width="26" height="35" rx="3" fill="#2b2e33"/>
+          <rect x="${px + 2}" y="${py + 4}" width="22" height="17" rx="1.5" fill="#0d3b4d"/>
+          <text x="${px + 13}" y="${py + 15.5}" text-anchor="middle" font-size="7" font-weight="700" font-family="monospace" fill="#6fd0e0" id="displayLg">LG</text>
+          <text x="${px + 13}" y="${py + 10.8}" text-anchor="middle" font-size="5.2" font-weight="700" font-family="monospace" fill="#6fd0e0" id="displayZone1Text"></text>
+          <text x="${px + 13}" y="${py + 18.3}" text-anchor="middle" font-size="5.2" font-weight="700" font-family="monospace" fill="#6fd0e0" id="displayZone2Text"></text>
+          <circle cx="${px + 5.5}" cy="${py + 24}" r="1.5" fill="#5a5e64"/>
+          <circle cx="${px + 10.5}" cy="${py + 24}" r="1.5" fill="#5a5e64"/>
+          <circle cx="${px + 15.5}" cy="${py + 24}" r="1.5" fill="#5a5e64"/>
+          <circle cx="${px + 20.5}" cy="${py + 24}" r="1.5" fill="#5a5e64"/>
+          <path d="M${px + 5} ${py + 27} h16 a2 2 0 0 1 2 2 v3 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-3 a2 2 0 0 1 2 -2 z" fill="#1c1e21"/>
+        `;
+    }
+
+    // French Door
+    _frenchDoorMarkup() {
+        return `
+          <rect x="8" y="11" width="38" height="117" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
+          <rect x="50" y="11" width="38" height="117" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
+          <rect x="46" y="11" width="4" height="117" fill="#8a8f96"/>
+          <rect class="door-glow" id="doorGlow" x="8" y="11" width="80" height="117" rx="5" fill="#f44336" opacity="0"/>
+          ${this._controlPanelSvg(12.5, 61)}
+          <rect x="41.5" y="28" width="2.6" height="80" rx="1.3" fill="#8f949b"/>
+          <rect x="51.9" y="28" width="2.6" height="80" rx="1.3" fill="#8f949b"/>
+          <rect x="8" y="133" width="80" height="32" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
+          <rect class="drawer-glow" id="drawerGlow" x="8" y="133" width="80" height="32" rx="5" fill="#4fc3f7" opacity="0"/>
+          <rect x="30" y="141" width="36" height="4" rx="2" fill="#8f949b"/>
+        `;
+    }
+
+    // Side-by-Side
+    _sideBySideMarkup() {
+        return `
+          <rect x="8" y="11" width="36" height="155" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
+          <rect x="52" y="11" width="36" height="155" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
+          <rect x="46" y="11" width="4" height="155" fill="#8a8f96"/>
+          <rect class="door-glow" id="doorGlow" x="8" y="11" width="80" height="155" rx="5" fill="#f44336" opacity="0"/>
+          <rect class="drawer-glow" id="drawerGlow" x="8" y="11" width="36" height="155" rx="5" fill="#4fc3f7" opacity="0"/>
+          ${this._controlPanelSvg(12.5, 71)}
+          <rect x="41.5" y="36" width="2.6" height="105" rx="1.3" fill="#8f949b"/>
+          <rect x="51.9" y="36" width="2.6" height="105" rx="1.3" fill="#8f949b"/>
+        `;
+    }
+
+    // Bottom Freezer
+    _bottomFreezerMarkup() {
+        return `
+          <rect x="8" y="11" width="80" height="100" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
+          <rect class="door-glow" id="doorGlow" x="8" y="11" width="80" height="100" rx="5" fill="#f44336" opacity="0"/>
+          <rect x="14" y="21" width="2.6" height="80" rx="1.3" fill="#8f949b"/>
+          <rect x="8" y="115" width="80" height="50" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
+          <rect class="drawer-glow" id="drawerGlow" x="8" y="115" width="80" height="50" rx="5" fill="#4fc3f7" opacity="0"/>
+          <rect x="30" y="120" width="36" height="4" rx="2" fill="#8f949b"/>
+        `;
+    }
+
+    // Top Freezer
+    _topFreezerMarkup() {
+        return `
+          <rect x="8" y="11" width="80" height="50" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
+          <rect x="8" y="65" width="80" height="100" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
+          <rect class="door-glow" id="doorGlow" x="8" y="11" width="80" height="154" rx="5" fill="#f44336" opacity="0"/>
+          <rect class="drawer-glow" id="drawerGlow" x="8" y="11" width="80" height="50" rx="5" fill="#4fc3f7" opacity="0"/>
+          <rect x="14" y="19" width="2.6" height="34" rx="1.3" fill="#8f949b"/>
+          <rect x="14" y="75" width="2.6" height="80" rx="1.3" fill="#8f949b"/>
+        `;
+    }
+
+    _fridgeLayoutMarkup() {
+        switch (this._config.fridge_layout) {
+        case "side_by_side":
+            return this._sideBySideMarkup();
+        case "bottom_freezer":
+            return this._bottomFreezerMarkup();
+        case "top_freezer":
+            return this._topFreezerMarkup();
+        case "french_door":
+        default:
+            return this._frenchDoorMarkup();
+        }
+    }
+
+    _fridgeSvgMarkup() {
+        return `
+          <svg viewBox="0 0 96 176" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-label="Refrigerator illustration">
+            <defs>
+              <linearGradient id="frBody" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#eef0f2"/><stop offset=".5" stop-color="#ccd0d4"/><stop offset="1" stop-color="#9da2a9"/>
+              </linearGradient>
+              <linearGradient id="frDoor" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#f6f7f8"/><stop offset="1" stop-color="#d4d7db"/>
+              </linearGradient>
+            </defs>
+            <rect x="4" y="6" width="88" height="165" rx="8" fill="url(#frBody)" stroke="#7d818a" stroke-width="1"/>
+            ${this._fridgeLayoutMarkup()}
+          </svg>
+        `;
+    }
+
     _build() {
         const config = this._config;
         const text = this._t;
@@ -554,36 +642,7 @@ class LgRefrigeratorCard extends HTMLElement {
 
           <div class="content-row">
             <div class="fridge-visual" id="fridgeVisual">
-              <svg viewBox="0 0 96 176" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-label="Refrigerator illustration">
-                <defs>
-                  <linearGradient id="frBody" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stop-color="#eef0f2"/><stop offset=".5" stop-color="#ccd0d4"/><stop offset="1" stop-color="#9da2a9"/>
-                  </linearGradient>
-                  <linearGradient id="frDoor" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="#f6f7f8"/><stop offset="1" stop-color="#d4d7db"/>
-                  </linearGradient>
-                </defs>
-                <rect x="4" y="6" width="88" height="165" rx="8" fill="url(#frBody)" stroke="#7d818a" stroke-width="1"/>
-                <rect x="8" y="11" width="38" height="117" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
-                <rect x="50" y="11" width="38" height="117" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
-                <rect x="46" y="11" width="4" height="117" fill="#8a8f96"/>
-                <rect class="door-glow" id="doorGlow" x="8" y="11" width="80" height="117" rx="5" fill="#f44336" opacity="0"/>
-                <rect x="13" y="61" width="26" height="35" rx="3" fill="#2b2e33"/>
-                <rect x="16" y="65" width="20" height="13" rx="1.5" fill="#0d3b4d"/>
-                <text x="26" y="73.2" text-anchor="middle" font-size="5.5" font-family="monospace" fill="#6fd0e0" id="displayLg">LG</text>
-                <text x="26" y="70.2" text-anchor="middle" font-size="3.6" font-family="monospace" fill="#6fd0e0" id="displayZone1Text"></text>
-                <text x="26" y="75.6" text-anchor="middle" font-size="3.6" font-family="monospace" fill="#6fd0e0" id="displayZone2Text"></text>
-                <circle cx="18.5" cy="83" r="1.5" fill="#5a5e64"/>
-                <circle cx="23.5" cy="83" r="1.5" fill="#5a5e64"/>
-                <circle cx="28.5" cy="83" r="1.5" fill="#5a5e64"/>
-                <circle cx="33.5" cy="83" r="1.5" fill="#5a5e64"/>
-                <path d="M17 87 h17 a2 2 0 0 1 2 2 v3 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-3 a2 2 0 0 1 2 -2 z" fill="#1c1e21"/>
-                <rect x="41.5" y="28" width="2.6" height="80" rx="1.3" fill="#8f949b"/>
-                <rect x="51.9" y="28" width="2.6" height="80" rx="1.3" fill="#8f949b"/>
-                <rect x="8" y="133" width="80" height="32" rx="5" fill="url(#frDoor)" stroke="#9aa0a6" stroke-width=".6"/>
-                <rect class="drawer-glow" id="drawerGlow" x="8" y="133" width="80" height="32" rx="5" fill="#4fc3f7" opacity="0"/>
-                <rect x="30" y="141" width="36" height="4" rx="2" fill="#8f949b"/>
-              </svg>
+              ${this._fridgeSvgMarkup()}
             </div>
             <div class="zones-column" id="zonesColumn">
               ${this._zoneMarkup(1)}
@@ -614,7 +673,7 @@ class LgRefrigeratorCard extends HTMLElement {
         this._el("waterUsedItem").addEventListener("click", moreInfo(config.water_filter_used_entity));
         this._el("badge").addEventListener("click", moreInfo(config.door_entity));
 
-        for (const zone of[1, 2]) {
+        for (const zone of [1, 2]) {
             this._el(`zone${zone}Ring`).addEventListener("click", moreInfo(config[`zone${zone}_temp_entity`]));
             this._el(`zone${zone}Label`).textContent = config[`zone${zone}_label`] || text[`zone${zone}_label`];
             this._el(`zone${zone}Minus`).addEventListener("click", (event) => {
@@ -823,6 +882,20 @@ class LgRefrigeratorCard extends HTMLElement {
 
 class LgRefrigeratorCardEditor extends HTMLElement {
     static SELECT_OPTIONS = {
+        fridge_layout: [{
+                value: "french_door",
+                label: "French Door"
+            }, {
+                value: "side_by_side",
+                label: "Side-by-Side"
+            }, {
+                value: "bottom_freezer",
+                label: "Bottom Freezer"
+            }, {
+                value: "top_freezer",
+                label: "Top Freezer"
+            },
+        ],
         fridge_visual_position: [{
                 value: "left",
                 label: "Left"
@@ -834,6 +907,8 @@ class LgRefrigeratorCardEditor extends HTMLElement {
     };
 
     static AUTO_LANGUAGE = "auto";
+    static DEFAULT_FRIDGE_LAYOUT = "french_door";
+    static DEFAULT_VISUAL_POSITION = "left";
 
     constructor() {
         super();
@@ -923,6 +998,7 @@ class LgRefrigeratorCardEditor extends HTMLElement {
           <div class="section-content"><div class="entity-grid">
             <label>Card name<input data-config="name" type="text"></label>
             <div class="field"><span>Language</span><ha-selector data-config="language"></ha-selector></div>
+            <div class="field"><span>Refrigerator layout</span><ha-selector data-config="fridge_layout"></ha-selector></div>
             <div class="field"><span>Illustration position</span><ha-selector data-config="fridge_visual_position"></ha-selector></div>
             <div class="switch-row">
               <div class="switch-text"><span class="switch-label">Hide illustration</span><span class="field-description">Hide the refrigerator illustration and enlarge the temperature zones.</span></div>
@@ -1030,10 +1106,23 @@ class LgRefrigeratorCardEditor extends HTMLElement {
             }
             if (element.tagName === "HA-SELECTOR") {
                 element.hass = this._hass;
-                // "language" needs the sentinel when unset so the dropdown
-                // shows "Automatic..." instead of appearing blank.
                 const isEmpty = value === undefined || value === null || value === "";
-                element.value = (key === "language" && isEmpty) ? LgRefrigeratorCardEditor.AUTO_LANGUAGE : (value ?? "");
+
+                if (key === "language") {
+                    element.value = isEmpty ? LgRefrigeratorCardEditor.AUTO_LANGUAGE : value;
+                    return;
+                }
+
+                if (key === "fridge_layout") {
+                    element.value = isEmpty ? LgRefrigeratorCardEditor.DEFAULT_FRIDGE_LAYOUT : value;
+                    return;
+                }
+
+                if (key === "fridge_visual_position") {
+                    element.value = isEmpty ? LgRefrigeratorCardEditor.DEFAULT_VISUAL_POSITION : value;
+                    return;
+                }
+                element.value = value ?? "";
                 return;
             }
             if (element.tagName === "HA-SWITCH") {
@@ -1100,7 +1189,7 @@ if (!window.customCards.some((card) => card.type === "lg-refrigerator-card")) {
     window.customCards.push({
         type: "lg-refrigerator-card",
         name: "LG Refrigerator Card",
-        description: "French-door LG ThinQ refrigerator card with freezer/fridge setpoints, door status, filters and notifications",
+        description: "Refrigerator card (French Door, Side-by-Side, Bottom Freezer, Top Freezer) with freezer/fridge setpoints, door status, filters and notifications",
         preview: true,
     });
 }
