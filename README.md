@@ -1,6 +1,6 @@
 # ❄️ LG Refrigerator Card
 
-A custom [Home Assistant](https://www.home-assistant.io/) Lovelace card for LG ThinQ French-door refrigerators. It displays fridge and freezer temperature setpoints, door status, Express Freeze mode, air/water filter status, water usage, and dismissible notifications, all in a compact, mobile-friendly layout.
+A custom [Home Assistant](https://www.home-assistant.io/) Lovelace card for LG ThinQ refrigerators. It displays fridge and freezer temperature setpoints, door status, Express Freeze mode, air/water filter status, water usage, and dismissible notifications, all in a compact, mobile-friendly layout.
 
 | Light Theme | Dark Theme |
 |---|---|
