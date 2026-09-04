@@ -23,6 +23,10 @@ A custom [Home Assistant](https://www.home-assistant.io/) Lovelace card for LG T
 
 This card is designed to work with entities exposed by the [LG Thinq](https://www.home-assistant.io/integrations/lg_thinq) integration.
 
+## 🧪 Model tested
+
+- GML8031ST.ASTQGSF (Fench Door)
+
 ## 📦 Installation
 
 ### HACS (recommended)
